@@ -17,7 +17,9 @@ A 股本地数据驱动的「交易终端 + 交易框架技能」组合：用通
 - **K 线读本地通达信**：前复权、ETF、成交量单位都按通达信口径；当天没下载盘后数据时用实时行情补一根。
 - **活跃市值多空区间**：指南针本地 0AMV 画成日线图背景；每天收盘后可自动打开指南针更新。
 - **通达信公式引擎选股**：终端右缘「选股」页签列出你在通达信里的自定义选股公式，用通达信自己的引擎算，结果和一键选股一致，不需要移植公式。
-- **每日选股报告**（HTML）：活跃市值、持仓的加仓 / 放飞 / 卖出信号、过滤后的选股（只写买入理由）、红利组 B1、入选后表现；名单自动同步到终端的「今日选股」分组。
+- **每日选股报告**（HTML）：活跃市值、持仓的加仓 / 放飞 / 卖出信号、过滤后的选股（只写买入理由）、红利组 B1、入选后表现；名单自动同步到终端的「今日选股」分组。终端右缘「报告」页签也能看，点股票就切到它的 K 线。
+- **Z哥诊断**：图表工具条一点，按技能规则算出这只股票的选股结论、砖块、B1、卖出信号等要点（几秒，不用大模型），可复制给 Z哥角色解读；港股只作参考。
+- **前向检验**：每天的入选名单在结果出来前就记下，统计入选后 5 / 10 日表现，对比同日随机基准、上证和被剔除的票，样本不够时直接写「样本不足」。
 - **Zettaranc（Z哥视角）分析角色**：在终端里按公开交易框架做择时、选股、买卖点和持仓诊断，没有下单工具。
 
 ## 需要什么
@@ -64,7 +66,7 @@ A 股本地数据驱动的「交易终端 + 交易框架技能」组合：用通
 - 克隆 zettaranc-skill 的 local-a-share 分支。
 - 在技能目录里建虚拟环境并装依赖：python -m venv .venv，然后 .venv\Scripts\python.exe -m pip install -r requirements.txt，再 .venv\Scripts\python.exe -m pip install -e .
   必须装在技能目录的 .venv 里：交易终端的选股页签、每日报告脚本和 Z哥角色都只调用 .venv\Scripts\python.exe，装到全局 Python 它们找不到。
-- 复制 .env.example 为 .env，至少填 TDX_DIR。有指南针就填 ZHINANZHEN_DATA_DIR。用交易终端的话填 DSH_HOME。
+- 复制 .env.example 为 .env，至少填 TDX_DIR。有指南针就填 ZHINANZHEN_DATA_DIR。用交易终端的话填 ZT_DSH_HOME（交易终端的 DSH home 目录；用 ZT_DSH_HOME 而不是 DSH_HOME，因为系统里已有的同名环境变量会盖过 .env）。
 - 运行 .venv\Scripts\python.exe -m modules.cli analyze 600036.SH，确认能读到本地通达信数据。
 
 第 3 步：装交易终端（按 dsh-trading 的 docs/guides/a-share-local-data.md 第 0 节）
@@ -74,7 +76,7 @@ A 股本地数据驱动的「交易终端 + 交易框架技能」组合：用通
 - 让 profile 用这个分支构建出来的包：先停掉终端，再把 profile 的 node_modules/@dshtrading 下每个包的 lib，换成仓库 packages/<同名包>/lib。
   - 全部替换，不要只换一部分：这个分支改了 base、bot-api、client-ui-trading、indicators、kit-cn、api，dsh-i18n 的构建产物也跟着变，只换一部分会新旧混用（例如活跃市值背景出不来）。
   - 复制前先备份原来的 lib；先删除目标 lib 再复制，因为它可能是 pnpm store 的硬链接，原地覆盖会改坏 store。
-- 在 DSH home 下建 local-data.json，写 tdxDir，有指南针再写 zhinanzhenDataDir。
+- 在 DSH home 下建 local-data.json，写 tdxDir；有指南针再写 zhinanzhenDataDir；要在终端里看每日报告再写 reportDir（技能 .env 里 REPORT_OUT_DIR 的同一个目录）。
 - 把技能放到 DSH_HOME/skills/zettaranc-perspective，或者设置环境变量 DSH_ZT_SKILL_DIR 指向技能目录。
 - 在桌面建一个启动脚本（.cmd）：设置 DSH_HOME，再用完整路径运行 dsh.cmd --profile trading-web --port 8888。双击启动后，用浏览器打开它输出的地址（http://127.0.0.1:8888/?token=…，token 是登录凭证，不要发给别人）。打开一只 A 股，确认日线正常；有指南针的话，确认图上有活跃市值背景。如果装了 TQ 插件，确认右侧竖栏的漏斗「选股」页签能列出公式。
 
