@@ -35,7 +35,7 @@ A 股本地数据驱动的「交易终端 + 交易框架技能」组合：用通
 1. **装技能**：克隆 `zike-1/zettaranc-skill` 的 `local-a-share` 分支，在技能目录建 `.venv` 并把依赖装进去（终端的选股页签、每日报告脚本和 Z哥角色都只调用这里的 Python），再按它 README 的「本地 A 股数据与每日报告」配置 `.env`（至少 `TDX_DIR`）。
 2. **装终端**：克隆 `zike-1/dsh-trading` 的 `local-a-share` 分支，按它的 [docs/guides/a-share-local-data.md](https://github.com/zike-1/dsh-trading/blob/local-a-share/docs/guides/a-share-local-data.md) 第 0 节安装：建 `trading-web` profile，构建本分支，把 profile 里的 `@dshtrading` 包换成本分支的构建。然后在 DSH home 里建 `local-data.json`（通达信、指南针目录），把技能放到 `DSH_HOME/skills/zettaranc-perspective`（或用 `DSH_ZT_SKILL_DIR` 指过去）。
 3. **接入你自己的公式**：选股公式保存在通达信「公式管理器」里，终端选股页签和每日报告都按公式名调用通达信引擎；需要离线回退时，按技能里的 `examples/user_formulas.example.py` 写 Python 版本。
-4. **每日自动化**（可选）：用 Windows 任务计划在工作日收盘后（如 20:00）运行技能的 `scripts/daily_report.cmd`；休市日它会自动跳过。
+4. **每日自动化**（可选）：用 Windows 任务计划在工作日收盘后（如 17:00）运行技能的 `scripts/daily_report.cmd`；休市日它会自动跳过。
 
 ## 让 AI 助手帮你装
 
@@ -83,7 +83,7 @@ A 股本地数据驱动的「交易终端 + 交易框架技能」组合：用通
 第 4 步（可选）：每日报告
 - 在技能的 .env 里配置 REPORT_OUT_DIR、ZT_REPORT_BLOCKS、ZT_TDX_FORMULA_MAP，公式名问我。
 - 手动跑一次 .venv\Scripts\python.exe -m modules.cli report，确认能生成 HTML 报告。
-- 我同意后，再用 Windows 任务计划设置每个工作日 20:00 运行 scripts/daily_report.cmd，选「只在用户登录时运行」（它要打开指南针窗口）。休市日脚本会自动跳过。
+- 我同意后，再用 Windows 任务计划设置每个工作日 17:00 运行 scripts/daily_report.cmd，选「只在用户登录时运行」（它要打开指南针窗口）。休市日脚本会自动跳过。
 
 必须遵守：
 - 通达信的 vipdoc、T0002 目录和指南针的数据目录只读，不要覆盖、删除或修改里面的文件。
